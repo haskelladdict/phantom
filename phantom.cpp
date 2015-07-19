@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <cstdio>
 #include <cstring>
@@ -29,11 +30,11 @@ using StringQueue = Pqueue<std::string>;
 
 
 // add_directory adds the content of the provided directory to the queue
-void add_directory(StringQueue& queue, const std::string& path) {
+void add_directory(StringQueue& queue, const std::string& path, Printer& print) {
 
   DIR* dir = opendir(path.c_str());
   if (dir == NULL) {
-    std::cerr << "opendir failed on " << path << std::endl;
+    print.cerr("opendir failed on " + path);
     return;
   }
 
@@ -71,22 +72,22 @@ void add_directory(StringQueue& queue, const std::string& path) {
 // 1) a filepath: computes and prints the hash of the file
 // 2) a directory path: adds contained files and directories contained to
 //    the queue
-void worker(StringQueue& queue) {
+void worker(StringQueue& queue, Printer& print) {
 
-  while (1) {
+  while (!queue.empty()) {
 
     auto path = queue.try_and_wait();
 
     // check if path is a directory or a file
     struct stat info;
     if (lstat(path->c_str(), &info) < 0) {
-      std::cerr << "lstat failed on " << *path << std::endl;
+      print.cerr("lstat failed on " + *path);
       continue;
     }
     if (S_ISREG(info.st_mode)) {
-      std::cout << *path << " =  " << md5hash(*path) << std::endl;
+      print.cout(*path + " = " + md5hash(*path));
     } else if (S_ISDIR(info.st_mode)) {
-      add_directory(queue, *path);
+      add_directory(queue, *path, print);
     }
   }
 }
@@ -101,7 +102,15 @@ int main(int argc, char** argv) {
 
   StringQueue sq;
   sq.push(argv[1]);
-  worker(sq);
 
+  Printer pr;
+  std::vector<std::thread> threads;
+  for (int i=0; i < num_workers; ++i) {
+    threads.push_back(std::thread(worker, std::ref(sq), std::ref(pr)));
+  }
 
+  // wait for threads to finish
+  for (auto& t : threads) {
+    t.join();
+  }
 }

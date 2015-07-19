@@ -5,8 +5,34 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
+#include <iostream>
+#include <mutex>
 #include <string>
+
 #include <dirent.h>
+
+
+// Printer is a helper class for serializing stdout and stderr
+class Printer {
+
+public:
+
+  void cout(const std::string& msg) const {
+    std::lock_guard<std::mutex> lg(mx_);
+    std::cout << msg << "\n";
+  }
+
+  void cerr(const std::string& msg) const {
+    std::lock_guard<std::mutex> lg(mx_);
+    std::cerr << msg << "\n";
+  }
+
+private:
+
+  mutable std::mutex mx_;
+
+};
+
 
 // helper function to compute the buf size required for dirent for
 // the particular filesystem in use. Code used mostly verbatim from

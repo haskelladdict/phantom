@@ -58,9 +58,7 @@ public:
 
   std::unique_ptr<T> try_and_wait() {
     std::unique_lock<std::mutex> ul(mx_);
-    ++num_waiting_;
     queue_ready_.wait(ul, [this] { return !queue_.empty();});
-    --num_waiting_;
     auto elem(std::make_unique<T>(queue_.front()));
     queue_.pop();
     return elem;
@@ -70,9 +68,8 @@ public:
 private:
 
   std::queue<T> queue_;
-  std::mutex mx_;
+  mutable std::mutex mx_;
   std::condition_variable queue_ready_;
-  int num_waiting_ = 0;
 
 };
 
