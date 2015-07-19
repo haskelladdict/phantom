@@ -7,7 +7,7 @@
 #define PARALLEL_QUEUE_HPP
 
 #include <condition_variable>
-#include <iostream>
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <thread>
@@ -19,15 +19,52 @@ class Pqueue {
 
 public:
 
+  using size_type = typename std::queue<T>::size_type;
+
   Pqueue() {};
 
   Pqueue(const Pqueue& pq) {
     std::lock_guard<std::mutex> lg(mx_);
     queue_ = pq.queue_;
-    std::cout << "copying queue" << std::endl;
   }
 
+  Pqueue& operator=(const Pqueue& pq) = delete;
 
+  size_type size() const {
+    std::lock_guard<std::mutex> lg(mx_);
+    return queue_.size();
+  }
+
+  bool empty() const {
+    std::lock_guard<std::mutex> lg(mx_);
+    return queue_.empty();
+  }
+
+  void push(const T& elem) {
+    std::lock_guard<std::mutex> lg(mx_);
+    queue_.push(elem);
+    queue_ready_.notify_one();
+  }
+
+  std::unique_ptr<T> try_pop() {
+    std::lock_guard<std::mutex> lg(mx_);
+    if (queue_.empty()) {
+      return std::make_unique<T>();
+    }
+    auto elem(std::make_unique<T>(queue_.front()));
+    queue_.pop();
+    return elem;
+  }
+
+  std::unique_ptr<T> try_and_wait() {
+    std::unique_lock<std::mutex> ul(mx_);
+    ++num_waiting_;
+    queue_ready_.wait(ul, [this] { return !queue_.empty();});
+    --num_waiting_;
+    auto elem(std::make_unique<T>(queue_.front()));
+    queue_.pop();
+    return elem;
+  }
 
 
 private:
@@ -35,6 +72,7 @@ private:
   std::queue<T> queue_;
   std::mutex mx_;
   std::condition_variable queue_ready_;
+  int num_waiting_ = 0;
 
 };
 

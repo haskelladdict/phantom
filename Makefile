@@ -1,6 +1,6 @@
 # Declaration of variables
 CC = g++-5
-CFLAGS = -std=c++14 -O2 -Wall
+CFLAGS = -std=c++14 -O0 -ggdb -Wall
 LDFLAGS = -lssl -lcrypto
 
 # File names
