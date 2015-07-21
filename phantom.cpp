@@ -74,9 +74,12 @@ void add_directory(StringQueue& queue, const std::string& path, Printer& print) 
 //    the queue
 void worker(StringQueue& queue, Printer& print) {
 
-  while (!queue.empty()) {
+  while (!queue.done()) {
 
     auto path = queue.try_and_wait();
+    if (!path) {
+      break;
+    }
 
     // check if path is a directory or a file
     struct stat info;
@@ -100,7 +103,7 @@ int main(int argc, char** argv) {
     usage();
   }
 
-  StringQueue sq;
+  StringQueue sq(num_workers);
   sq.push(argv[1]);
 
   Printer pr;
