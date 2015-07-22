@@ -23,7 +23,7 @@
 
 
 // convenience defs
-const int num_workers = 4;
+const int num_workers = 1;
 
 using StringQueue = Pqueue<std::string>;
 

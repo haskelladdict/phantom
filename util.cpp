@@ -32,6 +32,29 @@ std::string concat_filepaths(std::string& s1, const std::string& s2) {
   return s1.substr(0, i+1) + "/" + s2;
 }
 
+// File is a thin wrapper class for managing C style filepointers
+File::File(const std::string& fileName) : fileName_(fileName) {}
+
+
+File::~File() {
+  fclose(fp_);
+}
+
+
+bool File::init() {
+  fp_ = fopen(fileName_.c_str(), "r");
+  if (fp_ == NULL) {
+    return false;
+  }
+  return true;
+}
+
+
+FILE* File::fp() {
+  return fp_;
+}
+
+
 // simple usage message
 void usage() {
   std::cout << "usage(): phantom <path>" << std::endl;

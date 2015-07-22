@@ -63,7 +63,7 @@ public:
     // and we need to tear down. To do so, set done to true and wake up all
     // sleeping threads.
     ++num_waiting_;
-    if (num_waiting_ == num_threads_) {
+    if (num_waiting_ == num_threads_ && queue_.size() == 0) {
       done_ = true;
       queue_ready_.notify_all();
     }

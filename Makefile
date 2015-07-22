@@ -1,7 +1,7 @@
 # Declaration of variables
 CC = g++-5
 CFLAGS = -std=c++14 -O0 -ggdb -Wall
-LDFLAGS = -lssl -lcrypto
+LDFLAGS = -lssl -lcrypto -lpthread
 
 # File names
 EXEC = phantom

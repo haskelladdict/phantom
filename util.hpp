@@ -5,11 +5,35 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
+#include <cstdio>
+#include <dirent.h>
+
 #include <iostream>
 #include <mutex>
 #include <string>
 
-#include <dirent.h>
+
+
+// File is a thin wrapper class for managing C style filepointers
+class File {
+
+public:
+
+  File(const std::string& fileName);
+  ~File();
+
+  bool init();
+
+  FILE* fp();
+
+
+private:
+
+  std::string fileName_;
+  FILE *fp_;
+
+};
+
 
 
 // Printer is a helper class for serializing stdout and stderr
