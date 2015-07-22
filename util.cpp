@@ -22,6 +22,7 @@ size_t dirent_buf_size(DIR* dirp) {
   return (name_end > sizeof(struct dirent) ? name_end : sizeof(struct dirent));
 }
 
+
 // concat_filepaths concatenates two filepaths into one single path
 std::string concat_filepaths(std::string& s1, const std::string& s2) {
   if (s1.length() == 0) {
@@ -32,8 +33,14 @@ std::string concat_filepaths(std::string& s1, const std::string& s2) {
   return s1.substr(0, i+1) + "/" + s2;
 }
 
+
 // File is a thin wrapper class for managing C style filepointers
-File::File(const std::string& fileName) : fileName_(fileName) {}
+File::File(const std::string& fileName) {
+  fp_ = fopen(fileName.c_str(), "r");
+  if (fp_ == NULL) {
+    throw FailedFileAccess(fileName);
+  }
+}
 
 
 File::~File() {
@@ -41,17 +48,27 @@ File::~File() {
 }
 
 
-bool File::init() {
-  fp_ = fopen(fileName_.c_str(), "r");
-  if (fp_ == NULL) {
-    return false;
-  }
-  return true;
+FILE* File::get() {
+  return fp_;
 }
 
 
-FILE* File::fp() {
-  return fp_;
+// Dir is a thin wrapper class for managing C style directory pointers
+Dir::Dir(const std::string& dirName) {
+  dp_ = opendir(dirName.c_str());
+  if (dp_ == NULL) {
+    throw FailedDirAccess(dirName);
+  }
+}
+
+
+Dir::~Dir() {
+  closedir(dp_);
+}
+
+
+DIR* Dir::get() {
+  return dp_;
 }
 
 
@@ -60,6 +77,7 @@ void usage() {
   std::cout << "usage(): phantom <path>" << std::endl;
   exit(1);
 }
+
 
 // error wrapper
 void error(const std::string& msg) {

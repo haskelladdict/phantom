@@ -8,10 +8,31 @@
 #include <cstdio>
 #include <dirent.h>
 
+#include <exception>
 #include <iostream>
 #include <mutex>
+#include <stdexcept>
 #include <string>
 
+
+// custom exception class for failed file access (e.g. due to improper permissions)
+class FailedFileAccess : public std::runtime_error {
+
+public:
+
+  FailedFileAccess(const std::string& msg)
+    : runtime_error("Failed to access file: " + msg) {}
+};
+
+
+// custom exception class for failed directory access (e.g. due to improper permissions)
+class FailedDirAccess : public std::runtime_error {
+
+public:
+
+  FailedDirAccess(const std::string& msg)
+    : runtime_error("Failed to access directory: " + msg) {}
+};
 
 
 // File is a thin wrapper class for managing C style filepointers
@@ -22,18 +43,28 @@ public:
   File(const std::string& fileName);
   ~File();
 
-  bool init();
-
-  FILE* fp();
-
+  FILE* get();
 
 private:
 
-  std::string fileName_;
   FILE *fp_;
-
 };
 
+
+// Dir is a thin wrapper class for managing C style directory pointers
+class Dir {
+
+public:
+
+  Dir(const std::string& dirName);
+  ~Dir();
+
+  DIR* get();
+
+private:
+
+  DIR *dp_;
+};
 
 
 // Printer is a helper class for serializing stdout and stderr
