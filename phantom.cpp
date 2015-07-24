@@ -14,12 +14,9 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include "cmdline.hpp"
 #include "hash.hpp"
 #include "util.hpp"
-
-
-// convenience defs
-const int num_workers = 4;
 
 
 // worker requests items from the queue which are either file or
@@ -30,7 +27,6 @@ const int num_workers = 4;
 void worker(StringQueue& queue, Printer& print) {
 
   while (!queue.done()) {
-
     auto path = queue.try_and_wait();
     if (!path) {
       break;
@@ -51,19 +47,20 @@ void worker(StringQueue& queue, Printer& print) {
 }
 
 
-
 int main(int argc, char** argv) {
 
-  if (argc != 2) {
+  if (argc <= 1) {
     usage();
   }
+  auto cmdlOpts = parse_cmdline(argc, argv);
 
-  StringQueue sq(num_workers);
-  sq.push(argv[1]);
+  // initialize queue with root path
+  StringQueue sq(cmdlOpts.numThreads);
+  sq.push(cmdlOpts.rootPath);
 
   Printer pr;
   std::vector<std::thread> threads;
-  for (int i=0; i < num_workers; ++i) {
+  for (int i=0; i < cmdlOpts.numThreads; ++i) {
     threads.push_back(std::thread(worker, std::ref(sq), std::ref(pr)));
   }
 

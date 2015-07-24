@@ -17,6 +17,9 @@
 #include "parallel_queue.hpp"
 
 
+const std::string version = "0.1";
+
+
 // custom exception class for failed file access (e.g. due to improper permissions)
 class FailedFileAccess : public std::runtime_error {
 

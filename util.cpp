@@ -114,7 +114,17 @@ DIR* Dir::get() {
 
 // simple usage message
 void usage() {
-  std::cout << "usage(): phantom <path>" << std::endl;
+  std::cout << "phantom v" << version << " (C) Markus Dittrich, 2015\n\n"
+            << "usage(): phantom [options] <root path>" << "\n\n"
+            << "options:\n"
+            << "\t -n, --num_threads <int>  number of parallel threads used for\n"
+            << "\t                          execution of program" << "\n"
+            << "\t -c, --compare <path>     path to file with phantom has output\n"
+            << "\t                          from a previous run. In this case phanton\n"
+            << "\t                          will list all files that are missing, new or\n"
+            << "\t                          different from the previous run.\n"
+            << "\t -h, --help               this message\n\n"
+            << std::endl;
   exit(1);
 }
 
