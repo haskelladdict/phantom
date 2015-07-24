@@ -98,5 +98,6 @@ private:
   bool done_ = false;
 };
 
+using StringQueue = Pqueue<std::string>;
 
 #endif

@@ -2,12 +2,52 @@
 //
 // (C) Markus Dittrich, 2015
 
-#include <iostream>
-
 #include <cstddef>
+#include <cstring>
 #include <unistd.h>
 
+#include <iostream>
+
 #include "util.hpp"
+
+
+// add_directory adds the content of the provided directory to the queue
+void add_directory(StringQueue& queue, const std::string& path, Printer& print) {
+
+  try {
+    Dir dir(path);
+
+    size_t length = dirent_buf_size(dir.get());
+    struct dirent *entry, *end;
+    if ((entry = (struct dirent*)malloc(length)) == NULL) {
+      error("failed to malloc struct dirent");
+    }
+
+    int status;
+    while ((status = readdir_r(dir.get(), entry, &end) == 0) && (end != NULL)) {
+
+      if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+        continue;
+      }
+
+      // we use d_type to figure out what type entries are. However, since d_type
+      // is not that portable it may be better to use lstat instead.
+      if (entry->d_type == DT_DIR || entry->d_type == DT_REG) {
+        std::string p(path);
+        std::string name(entry->d_name);
+        std::string path = concat_filepaths(p, name);
+        queue.push(path);
+      }
+    }
+    if (status != 0 && end != NULL) {
+      error("add_dir_to_queue(): Failed to parse directory.");
+    }
+    free(entry);
+  } catch (FailedDirAccess e) {
+    std::cerr << e.what() << "\n";
+    return;
+  }
+}
 
 
 // helper function to compute the buf size required for dirent for

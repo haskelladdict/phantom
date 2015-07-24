@@ -14,6 +14,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "parallel_queue.hpp"
+
 
 // custom exception class for failed file access (e.g. due to improper permissions)
 class FailedFileAccess : public std::runtime_error {
@@ -87,6 +89,10 @@ private:
   mutable std::mutex mx_;
 
 };
+
+
+// add_directory adds the content of the provided directory to the queue
+void add_directory(StringQueue& queue, const std::string& path, Printer& print);
 
 
 // helper function to compute the buf size required for dirent for
