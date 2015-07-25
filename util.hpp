@@ -95,7 +95,8 @@ private:
 
 
 // add_directory adds the content of the provided directory to the queue
-void add_directory(StringQueue& queue, const std::string& path, Printer& print);
+void add_directory(StringQueue& queue, const std::string& path,
+  const Printer& print);
 
 
 // helper function to compute the buf size required for dirent for

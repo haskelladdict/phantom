@@ -1,4 +1,4 @@
-// this file implements a number of hash routines on top of openssl
+// this file contains the commandline parser for phantom
 //
 // (C) Markus Dittrich, 2015
 
@@ -40,7 +40,7 @@ struct CmdLineOpts parse_cmdline(int argc, char** argv) {
 
       case 'c':
         cmdOpts.compareToRef = true;
-        cmdOpts.compareFilePath = optarg;
+        cmdOpts.referenceFilePath = optarg;
         break;
 
       case 'h':

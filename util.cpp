@@ -12,7 +12,7 @@
 
 
 // add_directory adds the content of the provided directory to the queue
-void add_directory(StringQueue& queue, const std::string& path, Printer& print) {
+void add_directory(StringQueue& queue, const std::string& path, const Printer& print) {
 
   try {
     Dir dir(path);
@@ -115,16 +115,16 @@ DIR* Dir::get() {
 // simple usage message
 void usage() {
   std::cout << "phantom v" << version << " (C) Markus Dittrich, 2015\n\n"
-            << "usage(): phantom [options] <root path>" << "\n\n"
-            << "options:\n"
-            << "\t -n, --num_threads <int>  number of parallel threads used for\n"
-            << "\t                          execution of program" << "\n"
-            << "\t -c, --compare <path>     path to file with phantom has output\n"
-            << "\t                          from a previous run. In this case phanton\n"
-            << "\t                          will list all files that are missing, new or\n"
-            << "\t                          different from the previous run.\n"
-            << "\t -h, --help               this message\n\n"
-            << std::endl;
+    << "usage(): phantom [options] <root path>" << "\n\n"
+    << "options:\n"
+    << "\t -n, --num_threads <int>         number of parallel threads used for\n"
+    << "\t                                 execution of program" << "\n"
+    << "\t -c, --compare <reference file>  path to reference file with phantom output\n"
+    << "\t                                 from a previous run. In this case phantom\n"
+    << "\t                                 will list all files that are missing, new or\n"
+    << "\t                                 different from the previous run.\n"
+    << "\t -h, --help                      this message\n\n"
+    << std::endl;
   exit(1);
 }
 
