@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
   std::vector<std::thread> threads;
   for (int i=0; i < cmdlOpts.numThreads; ++i) {
     threads.push_back(std::thread(worker, std::ref(sq), std::ref(pr),
-      std::ref(ref)));
+      std::ref(ref), cmdlOpts.hashMethod));
   }
 
   // wait for threads to finish

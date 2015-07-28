@@ -25,7 +25,8 @@ static void compare_to_reference(const std::string& path, const std::string& has
 // 1) a filepath: computes and prints the hash of the file
 // 2) a directory path: adds contained files and directories contained to
 //    the queue
-void worker(StringQueue& queue, const Printer& printer, RefData& rd) {
+void worker(StringQueue& queue, const Printer& printer, RefData& rd,
+  std::string hashMethod) {
 
   // if we receive a non-empty refMap we compare against it
   bool compare = false;
@@ -46,11 +47,11 @@ void worker(StringQueue& queue, const Printer& printer, RefData& rd) {
       continue;
     }
     if (S_ISREG(info.st_mode)) {
-      std::string hash = hasher("md5", path);
+      std::string hash = hasher(hashMethod, path);
       if (compare) {
         compare_to_reference(path, hash, printer, rd);
       } else {
-        printer.cout("MD5 , " + path + " , " + hash);
+        printer.cout(hashMethod + " , " + path + " , " + hash);
       }
     } else if (S_ISDIR(info.st_mode)) {
       add_directory(queue, path, printer);

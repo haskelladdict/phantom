@@ -14,6 +14,7 @@
 static struct option long_options[] = {
   {"num_threads", required_argument, NULL, 'n'},
   {"compare", required_argument, NULL, 'c'},
+  {"digest", required_argument, NULL, 'd'},
   {"help", no_argument, NULL, 'h'},
   {NULL, 0, NULL, 0}
 };
@@ -27,7 +28,7 @@ struct CmdLineOpts parse_cmdline(int argc, char** argv) {
 
   int c;
   long nthreads;
-  while ((c = getopt_long (argc, argv, "n:c:h", long_options, NULL)) != -1) {
+  while ((c = getopt_long (argc, argv, "n:c:d:h", long_options, NULL)) != -1) {
 
     switch(c) {
       case 'n':
@@ -41,6 +42,14 @@ struct CmdLineOpts parse_cmdline(int argc, char** argv) {
       case 'c':
         cmdOpts.compareToRef = true;
         cmdOpts.referenceFilePath = optarg;
+        break;
+
+      case 'd':
+        cmdOpts.hashMethod = optarg;
+        if (cmdOpts.hashMethod != "md5" && cmdOpts.hashMethod != "sha1"
+            && cmdOpts.hashMethod != "ripemd160") {
+          error("unknown hash method.");
+        }
         break;
 
       case 'h':

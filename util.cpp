@@ -123,6 +123,9 @@ void usage() {
     << "\t                                 from a previous run. In this case phantom\n"
     << "\t                                 will list all files that are missing, new or\n"
     << "\t                                 different from the previous run.\n"
+    << "\t -d, --digest <hash name>        select hash function to use for file digests.\n"
+    << "\t                                 Available hash functions are:\n"
+    << "\t                                 md5 (default), sha1, ripemd160\n"
     << "\t -h, --help                      this message\n\n"
     << std::endl;
   exit(1);
