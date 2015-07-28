@@ -7,17 +7,9 @@
 
 #include <string>
 
-#if defined(__APPLE__)
-#define COMMON_DIGEST_FOR_OPENSSL
-#include <CommonCrypto/CommonDigest.h>
-#define SHA1 CC_SHA1
-#else
-#include <openssl/md5.h>
-#endif
+#include <openssl/evp.h>
 
-
-// md5hash computes the md5 hash of the file at the provided filepath
-std::string md5hash(const std::string& path);
-
+// return the requested (by name) hash of the file at the provided path
+std::string hasher(const std::string& digest_name, const std::string& path);
 
 #endif

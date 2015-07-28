@@ -56,7 +56,7 @@ public:
     return elem;
   }
 
-  std::unique_ptr<T> try_and_wait() {
+  T /*std::unique_ptr<T>*/ try_and_wait() {
     std::unique_lock<std::mutex> ul(mx_);
 
     // once all active threads are waiting no more elements will enter the queue
@@ -70,13 +70,14 @@ public:
     while (queue_.empty()) {
       // only continue waiting if we are not done yet
       if (done_) {
-        return nullptr;
+        return std::string(); //nullptr;
       }
       queue_ready_.wait(ul);
     }
     --num_waiting_;
 
-    auto elem(std::make_unique<T>(queue_.front()));
+    //auto elem(std::make_unique<T>(queue_.front()));
+    T elem{queue_.front()};
     queue_.pop();
     return elem;
   }

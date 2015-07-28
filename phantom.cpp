@@ -6,6 +6,7 @@
 //
 // (C) Markus Dittrich 2015
 
+#include <openssl/evp.h>
 
 #include <iostream>
 #include <vector>
@@ -22,6 +23,11 @@ int main(int argc, char** argv) {
   if (argc <= 1) {
     usage();
   }
+
+  // initialize OpenSSL
+  // NOTE: Adding all digests may lead to large static executables
+  OpenSSL_add_all_digests();
+
   auto cmdlOpts = parse_cmdline(argc, argv);
   RefData ref;
   if (cmdlOpts.compareToRef) {
@@ -53,4 +59,7 @@ int main(int argc, char** argv) {
       std::cout << "file disappeared:  " << e.first << "\n";
     }
   }
+
+  // cleanup openssl
+  EVP_cleanup();
 }

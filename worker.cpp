@@ -35,25 +35,25 @@ void worker(StringQueue& queue, const Printer& printer, RefData& rd) {
 
   while (!queue.done()) {
     auto path = queue.try_and_wait();
-    if (!path) {
+    if (path.empty()) {
       break;
     }
 
     // check if path is a directory or a file
     struct stat info;
-    if (lstat(path->c_str(), &info) < 0) {
-      printer.cerr("lstat failed on " + *path);
+    if (lstat(path.c_str(), &info) < 0) {
+      printer.cerr("lstat failed on " + path);
       continue;
     }
     if (S_ISREG(info.st_mode)) {
-      std::string hash = md5hash(*path);
+      std::string hash = hasher("md5", path);
       if (compare) {
-        compare_to_reference(*path, hash, printer, rd);
+        compare_to_reference(path, hash, printer, rd);
       } else {
-        printer.cout("MD5 , " + *path + " , " + hash);
+        printer.cout("MD5 , " + path + " , " + hash);
       }
     } else if (S_ISDIR(info.st_mode)) {
-      add_directory(queue, *path, printer);
+      add_directory(queue, path, printer);
     }
   }
 }
