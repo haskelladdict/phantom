@@ -6,8 +6,10 @@
 #include <cstring>
 #include <unistd.h>
 
+#include <chrono>
 #include <iostream>
 
+#include "stats.hpp"
 #include "util.hpp"
 
 
@@ -126,6 +128,8 @@ void usage() {
     << "\t -d, --digest <hash name>        select hash function to use for file digests.\n"
     << "\t                                 Available hash functions are:\n"
     << "\t                                 md5 (default), sha1, ripemd160\n"
+    << "\t -s, --collect_stats             collect file and processed data statistics\n"
+    << "\t                                 and print them at the end.\n"
     << "\t -h, --help                      this message\n\n"
     << std::endl;
   exit(1);
@@ -136,4 +140,34 @@ void usage() {
 void error(const std::string& msg) {
   std::cout << "ERROR: " << msg << std::endl;
   exit(1);
+}
+
+
+// print_stats prints the final file and data statistics to stdout
+void print_stats(const Stats& stats) {
+  auto now = std::chrono::system_clock::now();
+  auto dur = now - stats.startTime();
+  auto dur_ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur);
+  auto dur_count_s = dur_ms.count()/1000.0;
+  auto num_m_bytes = stats.num_bytes()/1024/1024;
+  std::cout << "\n\n"
+            << "**********************************************\n"
+            << "Final file and timing data:  \n"
+            << "**********************************************\n"
+            << "phantom version : " << version << "\n"
+            << "date            : " << time_point_to_c_time(now) << "\n"
+            << "elapsed time    : " << dur_count_s << " s\n"
+            << "files processed : " << stats.num_files() << "\n"
+            << "data processed  : " << num_m_bytes << " MB\n"
+            << "throughput      : " << num_m_bytes/dur_count_s << " MB/s\n"
+            << std::endl;
+}
+
+
+// convert a std::chrono::time_point to a human readable string
+std::string time_point_to_c_time(const std::chrono::system_clock::time_point& tp) {
+  auto time_t = std::chrono::system_clock::to_time_t(tp);
+  std::string t = std::ctime(&time_t);
+  t.resize(t.size()-1);
+  return t;
 }

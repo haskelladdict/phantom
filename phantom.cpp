@@ -8,6 +8,7 @@
 
 #include <openssl/evp.h>
 
+#include <chrono>
 #include <iostream>
 #include <vector>
 
@@ -29,23 +30,24 @@ int main(int argc, char** argv) {
   OpenSSL_add_all_digests();
 
   auto cmdlOpts = parse_cmdline(argc, argv);
-  RefData ref;
+  RefData refData;
   if (cmdlOpts.compareToRef) {
-    ref.refMap = load_reference_data(cmdlOpts.referenceFilePath);
-    if (ref.refMap.empty()) {
+    refData.refMap = load_reference_data(cmdlOpts.referenceFilePath);
+    if (refData.refMap.empty()) {
       error("Failed to parse reference data file");
     }
   }
 
   // initialize queue with root path
-  StringQueue sq(cmdlOpts.numThreads);
-  sq.push(cmdlOpts.rootPath);
+  StringQueue fileQueue(cmdlOpts.numThreads);
+  fileQueue.push(cmdlOpts.rootPath);
 
-  Printer pr;
+  Printer printer;
+  Stats stats(std::chrono::system_clock::now());
   std::vector<std::thread> threads;
   for (int i=0; i < cmdlOpts.numThreads; ++i) {
-    threads.push_back(std::thread(worker, std::ref(sq), std::ref(pr),
-      std::ref(ref), cmdlOpts.hashMethod));
+    threads.push_back(std::thread(worker, std::ref(fileQueue), std::ref(printer),
+      std::ref(refData), std::ref(stats), std::ref(cmdlOpts)));
   }
 
   // wait for threads to finish
@@ -54,10 +56,15 @@ int main(int argc, char** argv) {
   }
 
   // check for disappeared files
-  for (const auto& e : ref.refMap) {
-    if (ref.fileMap.find(e.first) == ref.fileMap.end()) {
+  for (const auto& e : refData.refMap) {
+    if (refData.fileMap.find(e.first) == refData.fileMap.end()) {
       std::cout << "file disappeared:  " << e.first << "\n";
     }
+  }
+
+  // print final statistics
+  if (cmdlOpts.collectStats) {
+    print_stats(stats);
   }
 
   // cleanup openssl

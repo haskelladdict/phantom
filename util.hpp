@@ -17,7 +17,11 @@
 #include "parallel_queue.hpp"
 
 
-const std::string version = "0.1";
+const std::string version = "0.2";
+
+
+// forward declarations
+class Stats;
 
 
 // custom exception class for failed file access (e.g. due to improper permissions)
@@ -116,5 +120,13 @@ void usage();
 
 // error wrapper
 void error(const std::string& msg);
+
+
+// print final file/data statistics to stdout
+void print_stats(const Stats& stats);
+
+
+// convert a std::chrono::time_point to a human readable string
+std::string time_point_to_c_time(const std::chrono::system_clock::time_point& tp);
 
 #endif

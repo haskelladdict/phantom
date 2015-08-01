@@ -12,6 +12,7 @@
 struct CmdLineOpts {
   int numThreads = 1;             // number of threads to use
   bool compareToRef = false;      // do we want to compare against a reference
+  bool collectStats = false;      // do we want to collect file/data statistics
   std::string hashMethod = "md5"; // what hash function to use for digest
   std::string referenceFilePath;  // file and if yes, where's the reference file
   std::string rootPath;           // root of directory to work on

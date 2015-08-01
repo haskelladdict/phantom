@@ -56,7 +56,7 @@ public:
     return elem;
   }
 
-  T /*std::unique_ptr<T>*/ try_and_wait() {
+  T try_and_wait() {
     std::unique_lock<std::mutex> ul(mx_);
 
     // once all active threads are waiting no more elements will enter the queue

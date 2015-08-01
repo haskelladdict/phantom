@@ -8,8 +8,10 @@
 #include <iostream>
 #include <string>
 
+#include "cmdline.hpp"
 #include "parallel_map.hpp"
 #include "refParser.hpp"
+#include "stats.hpp"
 
 
 struct RefData {
@@ -22,8 +24,8 @@ struct RefData {
 // 1) a filepath: computes and prints the hash of the file
 // 2) a directory path: adds contained files and directories contained to
 //    the queue
-void worker(StringQueue& queue, const Printer& print, RefData& rd,
-  std::string hashMethod);
+void worker(StringQueue& queue, const Printer& print, RefData& rd, Stats& stats,
+  CmdLineOpts& opts);
 
 #endif
 

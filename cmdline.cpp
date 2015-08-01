@@ -15,6 +15,7 @@ static struct option long_options[] = {
   {"num_threads", required_argument, NULL, 'n'},
   {"compare", required_argument, NULL, 'c'},
   {"digest", required_argument, NULL, 'd'},
+  {"collect_stats", no_argument, NULL, 's'},
   {"help", no_argument, NULL, 'h'},
   {NULL, 0, NULL, 0}
 };
@@ -28,7 +29,7 @@ struct CmdLineOpts parse_cmdline(int argc, char** argv) {
 
   int c;
   long nthreads;
-  while ((c = getopt_long (argc, argv, "n:c:d:h", long_options, NULL)) != -1) {
+  while ((c = getopt_long (argc, argv, "n:c:d:sh", long_options, NULL)) != -1) {
 
     switch(c) {
       case 'n':
@@ -42,6 +43,10 @@ struct CmdLineOpts parse_cmdline(int argc, char** argv) {
       case 'c':
         cmdOpts.compareToRef = true;
         cmdOpts.referenceFilePath = optarg;
+        break;
+
+      case 's':
+        cmdOpts.collectStats = true;
         break;
 
       case 'd':
